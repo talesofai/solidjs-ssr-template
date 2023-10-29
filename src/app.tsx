@@ -1,14 +1,6 @@
-import UnoResetStyles from "@unocss/reset/sanitize/sanitize.css?inline";
-import { useAssets } from "solid-js/web";
-import UnoGlobalStyles from "uno.css?inline";
-import UnoStyles from "virtual:uno.css?inline";
 import { useSSRContext } from "./ssr-context";
 
 function App() {
-  useAssets(() => <style type="text/css">{UnoResetStyles}</style>);
-  useAssets(() => <style type="text/css">{UnoGlobalStyles}</style>);
-  useAssets(() => <style type="text/css">{UnoStyles}</style>);
-
   const ssrContext = useSSRContext();
 
   return (

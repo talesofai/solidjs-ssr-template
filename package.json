@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "node server",
-    "build": "pnpm build:client && pnpm build:server",
-    "build:client": "vite build --outDir dist/client",
+    "build-csr": "cross-env vite build --outDir dist/csr",
+    "build:client-ssr": "cross-env VITE_SSR=true vite build --outDir dist/client",
     "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
-    "preview": "cross-env NODE_ENV=production node server"
+    "build-ssr": "pnpm build:client-ssr && pnpm build:server",
+    "preview-csr": "vite preview --outDir dist/csr",
+    "preview-ssr": "cross-env NODE_ENV=production node server"
   },
   "dependencies": {
     "compression": "^1.7.4",
