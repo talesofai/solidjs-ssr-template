@@ -2,18 +2,21 @@ import UnoResetStyles from "@unocss/reset/sanitize/sanitize.css?inline";
 import { useAssets } from "solid-js/web";
 import UnoGlobalStyles from "uno.css?inline";
 import UnoStyles from "virtual:uno.css?inline";
+import { useSSRContext } from "./ssr-context";
 
 function App() {
   useAssets(() => <style type="text/css">{UnoResetStyles}</style>);
   useAssets(() => <style type="text/css">{UnoGlobalStyles}</style>);
   useAssets(() => <style type="text/css">{UnoStyles}</style>);
 
+  const ssrContext = useSSRContext();
+
   return (
     <div class="w-screen h-screen">
       <div class="h-full text-center flex select-none all:transition-400">
         <div class="ma">
           <div class="text-5xl fw100 animate-bounce-alt animate-count-infinite animate-duration-1s">
-            UnoCSS
+            UnoCSS SSR {ssrContext?.url}
           </div>
           <div class="op30 text-lg fw300 m1">
             The instant on-demand Atomic CSS engine.

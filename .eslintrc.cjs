@@ -2,6 +2,9 @@ module.exports = {
   env: {
     node: true,
   },
+  globals: {
+    SSRContext: true,
+  },
   parser: "@typescript-eslint/parser",
   plugins: ["solid"],
   extends: [
