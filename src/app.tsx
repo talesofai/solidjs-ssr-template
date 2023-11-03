@@ -1,4 +1,4 @@
-import { useSSRContext } from "./ssr-context";
+import { useSSRContext } from './ssr-context';
 
 function App() {
   const ssrContext = useSSRContext();
@@ -8,7 +8,9 @@ function App() {
       <div class="h-full text-center flex select-none all:transition-400">
         <div class="ma">
           <div class="text-5xl fw100 animate-bounce-alt animate-count-infinite animate-duration-1s">
-            UnoCSS SSR {ssrContext?.url}
+            UnoCSS SSR
+            {' '}
+            {ssrContext?.url}
           </div>
           <div class="op30 text-lg fw300 m1">
             The instant on-demand Atomic CSS engine.

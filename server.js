@@ -1,23 +1,26 @@
-// ts-check
+// @ts-check
 
-import compression from "compression";
-import express from "express";
-import fs from "fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import serveStatic from "serve-static";
-import * as vite from "vite";
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import process from 'node:process';
+import express from 'express';
+import compression from 'compression';
+import serveStatic from 'serve-static';
+import * as vite from 'vite';
+import { logger } from './src/utils/logger.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const isTest = process.env.VITEST;
+const SSR = process.env.SSR;
 
 export async function createServer(
   root = process.cwd(),
-  isProd = process.env.NODE_ENV === "production",
+  isProd = process.env.NODE_ENV === 'production',
   hmrPort,
 ) {
-  const resolve = (p) => path.resolve(__dirname, p);
+  const resolve = p => path.resolve(__dirname, p);
 
   const app = express();
 
@@ -28,7 +31,7 @@ export async function createServer(
   if (!isProd) {
     viteServer = await vite.createServer({
       root,
-      logLevel: isTest ? "error" : "info",
+      logLevel: isTest ? 'error' : 'info',
       server: {
         middlewareMode: true,
         watch: {
@@ -41,20 +44,21 @@ export async function createServer(
           port: hmrPort,
         },
       },
-      appType: "custom",
+      appType: 'custom',
     });
 
     app.use(viteServer.middlewares);
-  } else {
+  }
+  else {
     app.use(compression());
     app.use(
-      serveStatic(resolve("dist/client"), {
+      serveStatic(resolve('dist/client'), {
         index: false,
       }),
     );
   }
 
-  app.use("*", async (req, res) => {
+  app.use('*', async (req, res) => {
     try {
       const url = req.originalUrl;
 
@@ -68,29 +72,37 @@ export async function createServer(
       let render;
       if (!isProd) {
         // always read fresh template in dev
-        template = fs.readFileSync(resolve("index.html"), "utf-8");
+        template = fs.readFileSync(resolve('index.html'), 'utf-8');
         template = await viteServer.transformIndexHtml(url, template);
-        render = (await viteServer.ssrLoadModule("/src/entry-server.tsx"))
+        render = (await viteServer.ssrLoadModule('/src/entry-server.tsx'))
           .render;
-      } else {
+      }
+      else {
         const indexProd = isProd
-          ? fs.readFileSync(resolve("dist/client/index.html"), "utf-8")
-          : "";
+          ? fs.readFileSync(resolve('dist/client/index.html'), 'utf-8')
+          : '';
         template = indexProd;
-        render = (await import("./dist/server/entry-server.js")).render;
+        // @ts-expect-error - generate after build
+        render = (await import('./dist/server/entry-server.js')).render;
       }
 
-      const renderResult = render(req);
+      if (SSR) {
+        const renderResult = render(req);
 
-      const html = template
-        .replace(`<!--app-html-->`, renderResult.html)
-        .replace(`<!--app-assets-->`, renderResult.assets)
-        .replace(`<!--app-scripts-->`, renderResult.scripts);
+        const html = template
+          .replace(`<!--app-html-->`, renderResult.html)
+          .replace(`<!--app-assets-->`, renderResult.assets)
+          .replace(`<!--app-scripts-->`, renderResult.scripts);
 
-      res.status(200).set({ "Content-Type": "text/html" }).end(html);
-    } catch (e) {
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
+      }
+      else {
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
+      }
+    }
+    catch (e) {
       !isProd && viteServer.ssrFixStacktrace(e);
-      console.log(e.stack);
+      logger.error(e.stack);
       res.status(500).end(e.stack);
     }
   });
@@ -101,7 +113,7 @@ export async function createServer(
 if (!isTest) {
   createServer().then(({ app }) =>
     app.listen(3000, () => {
-      console.log("http://localhost:3000");
+      logger.info('http://localhost:3000');
     }),
   );
 }

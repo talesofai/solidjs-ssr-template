@@ -1,35 +1,37 @@
 {
   "name": "solid-ssr-demo",
-  "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
     "dev": "node server",
-    "build-csr": "cross-env vite build --outDir dist/csr",
+    "build": "cross-env vite build --outDir dist/csr",
+    "preview": "vite preview --outDir dist/csr",
+    "dev-ssr": "cross-env VITE_SSR=true node server",
     "build:client-ssr": "cross-env VITE_SSR=true vite build --outDir dist/client",
     "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
     "build-ssr": "pnpm build:client-ssr && pnpm build:server",
-    "preview-csr": "vite preview --outDir dist/csr",
-    "preview-ssr": "cross-env NODE_ENV=production node server"
+    "preview-ssr": "cross-env NODE_ENV=production node server",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "compression": "^1.7.4",
     "cross-env": "^7.0.3",
     "express": "^4.18.2",
     "serve-static": "^1.15.0",
-    "solid-js": "^1.8.4"
+    "solid-js": "^1.8.4",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^1.1.0",
     "@types/express": "^4.17.20",
     "@typescript-eslint/parser": "^6.9.0",
     "@unocss/reset": "^0.57.1",
     "autoprefixer": "^10.4.16",
     "eslint": "^8.52.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-solid": "^0.13.0",
     "postcss": "^8.4.31",
-    "prettier-plugin-organize-imports": "^3.2.3",
     "typescript": "^5.0.2",
     "unocss": "^0.57.1",
     "vite": "^4.4.5",
